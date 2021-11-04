@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react'
 import {useQuery, useMutation, useQueryClient } from 'react-query'
 import {useParamsContext} from "../../context";
+import isEmpty from 'lodash/isEmpty';
 
 export const useMountedRef = () => {
   const isMounted = useRef(false);
@@ -15,7 +16,7 @@ export const useMountedRef = () => {
 
 
 // 文档：https://react-query.tanstack.com/reference/useQuery#_top
-export const useListQuery = ({ queryKey, api, dependencies }) => {
+export const useListQuery = ({ queryKey, api }, dependencies) => {
   const { setParams } = useParamsContext();
   const queryClient = useQueryClient();
 
@@ -32,6 +33,7 @@ export const useListQuery = ({ queryKey, api, dependencies }) => {
     {
       refetchOnWindowFocus: false,
       retry: false,
+      enabled: !isEmpty(dependencies),
       onError: (error) => {
         setParams(null);
         queryClient.removeQueries([queryKey, dependencies], { exact: true });
@@ -40,7 +42,7 @@ export const useListQuery = ({ queryKey, api, dependencies }) => {
   )
 }
 
-export const useDeleteMutation = ({ queryKey, api, dependencies, itemKey}) => {
+export const useDeleteMutation = ({ queryKey, api, itemKey}, dependencies) => {
   return useMutation(
     (apiParams) => api(apiParams),
     useCallBack([queryKey, dependencies],
@@ -52,7 +54,7 @@ export const useDeleteMutation = ({ queryKey, api, dependencies, itemKey}) => {
   )
 }
 
-export const useUpdateMutation = ({ queryKey, api, dependencies, itemKey}) => {
+export const useUpdateMutation = ({ queryKey, api, itemKey}, dependencies) => {
   return useMutation(
     (apiParams) => api(apiParams),
     useCallBack([queryKey, dependencies],

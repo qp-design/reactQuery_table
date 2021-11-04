@@ -4,6 +4,9 @@ import { useCallback } from 'react'
 import { useUpdateMutation, useDeleteMutation } from '@/libs/hooks'
 import {goodsDelete, goodsOffShelf, goodsPublish} from '@/libs/api/goods-api'
 import { deleteModel } from "@/libs/utils/deleteModel";
+import drawerJsx from "@/libs/utils/drawerJsx";
+import diaglogJsx from "@/libs/utils/dialogJsx";
+import Demo from "../demo";
 
 const TableJsx = ({ params, queryKey, ...resetProps }) => {
   const { mutate: deleteHandler } = useDeleteMutation({
@@ -29,6 +32,14 @@ const TableJsx = ({ params, queryKey, ...resetProps }) => {
 
   const editorAction = (params) => {
     console.log(params)
+    drawerJsx(Demo, {
+      drawerConfig: {
+        title: 'XXXXX'
+      },
+      restsProps: {
+
+      }
+    })
   }
 
   const upDown = (params) => {

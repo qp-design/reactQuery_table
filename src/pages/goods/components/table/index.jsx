@@ -8,9 +8,8 @@ export default function Index() {
   const { params } = useParamsContext();
   const { data, isLoading } = useListQuery({
     queryKey: 'goods',
-    api: goodsQuery,
-    dependencies: params,
-  })
+    api: goodsQuery
+  }, params)
   return (
     <Spin
       spinning={isLoading}

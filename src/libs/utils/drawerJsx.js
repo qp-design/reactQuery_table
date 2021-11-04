@@ -11,7 +11,7 @@ const drawerJsx = (DrawerComponent, props) => {
         visible={true}
         footer={null}
         {...props.drawerConfig}
-        onCancel={destroyDialog}
+        onClose={destroyDialog}
       >
         <DrawerComponent
           destroyDialog={destroyDialog}
