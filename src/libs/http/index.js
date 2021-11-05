@@ -8,12 +8,14 @@ export default function fetchImplement(url, config) {
           // 没有登录
           reject({ message: "请重新登录" });
         }
+
         const data = await response.json();
-        if(data.code === '0') {
-          resolve(data.data)
-        } else {
-          throw new Error(data.msg)
-        }
+        resolve(data)
+        // if(data.code === '0') {
+        //   resolve(data.data)
+        // } else {
+        //   throw new Error(data.msg)
+        // }
       }).catch(error => {
         message.warning(error.message);
         reject(error)

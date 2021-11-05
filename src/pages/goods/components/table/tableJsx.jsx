@@ -12,23 +12,20 @@ const TableJsx = ({ params, queryKey, ...resetProps }) => {
   const { mutate: deleteHandler } = useDeleteMutation({
     queryKey,
     api: goodsDelete,
-    dependencies: params,
     itemKey: 'goodsId'
-  });
+  }, params);
 
   const { mutate: publishHandler } = useUpdateMutation({
     queryKey,
     api: goodsPublish,
-    dependencies: params,
     itemKey: 'id'
-  });
+  }, params);
 
   const { mutate: offShelf } = useUpdateMutation({
     queryKey,
     api: goodsOffShelf,
-    dependencies: params,
     itemKey: 'id'
-  })
+  }, params)
 
   const editorAction = (params) => {
     console.log(params)

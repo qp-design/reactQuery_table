@@ -2,6 +2,8 @@ import { useRef, useEffect } from 'react'
 import {useQuery, useMutation, useQueryClient } from 'react-query'
 import {useParamsContext} from "../../context";
 import isEmpty from 'lodash/isEmpty';
+import get from 'lodash/get';
+import set from 'lodash/set';
 
 export const useMountedRef = () => {
   const isMounted = useRef(false);
@@ -13,7 +15,6 @@ export const useMountedRef = () => {
 
   return isMounted
 }
-
 
 // 文档：https://react-query.tanstack.com/reference/useQuery#_top
 export const useListQuery = ({ queryKey, api }, dependencies) => {
@@ -34,10 +35,12 @@ export const useListQuery = ({ queryKey, api }, dependencies) => {
       refetchOnWindowFocus: false,
       retry: false,
       enabled: !isEmpty(dependencies),
-      onError: (error) => {
-        setParams(null);
-        queryClient.removeQueries([queryKey, dependencies], { exact: true });
-      },
+      onSettled: (data, error) => {
+        if(data.code !== '0') {
+          setParams(null);
+          queryClient.removeQueries([queryKey, dependencies], { exact: true });
+        }
+      }
     }
   )
 }
@@ -47,7 +50,8 @@ export const useDeleteMutation = ({ queryKey, api, itemKey}, dependencies) => {
     (apiParams) => api(apiParams),
     useCallBack([queryKey, dependencies],
       (target, old) => {
-        old.data = old.data?.filter(item => item[itemKey] !== target[itemKey])
+        const arr = get(old, ['data', 'data'], [])
+        set(old, ['data', 'data'], arr.filter(item => item[itemKey] !== target[itemKey]))
         return old
       }
     )
@@ -59,7 +63,7 @@ export const useUpdateMutation = ({ queryKey, api, itemKey}, dependencies) => {
     (apiParams) => api(apiParams),
     useCallBack([queryKey, dependencies],
       (target, old) => {
-        old.data = old.data?.map(item => item[itemKey] === target[itemKey] ? { ...item, ...target } : item)
+        old.data = old.data?.data?.map(item => item[itemKey] === target[itemKey] ? { ...item, ...target } : item)
         return old
       }
     )
@@ -77,11 +81,12 @@ const useCallBack = (queryKey, callback) => {
       });
       return { previousItems };
     },
-    onError(error, variables, context) {
-      queryClient.setQueryData(queryKey, context.previousItems);
-    },
-    onSuccess: (data, variables, context) => queryClient.invalidateQueries(queryKey),
     onSettled: (data, error, variables, context) => {
+      if(data.code !== '0') {
+        queryClient.setQueryData(queryKey, context.previousItems);
+      } else {
+        queryClient.invalidateQueries(queryKey)
+      }
       // Error or success... doesn't matter!
     },
   }
